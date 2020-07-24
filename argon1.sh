@@ -183,9 +183,8 @@ echo '		fanconfig = tmpconfig' >> $powerbuttonscript
 echo '	address=0x1a' >> $powerbuttonscript
 echo '	prevblock=0' >> $powerbuttonscript
 echo '	while True:' >> $powerbuttonscript
-echo '		temp = os.popen("vcgencmd measure_temp").readline()' >> $powerbuttonscript
-echo '		temp = temp.replace("temp=","")' >> $powerbuttonscript
-echo '		val = float(temp.replace("'"'"'C",""))' >> $powerbuttonscript
+echo '		temp = os.popen("cat /sys/class/thermal/thermal_zone0/temp").readline()' >> $powerbuttonscript
+echo '		val = float(int(temp)/1000)' >> $powerbuttonscript
 echo '		block = get_fanspeed(val, fanconfig)' >> $powerbuttonscript
 echo '		if block < prevblock:' >> $powerbuttonscript
 echo '			time.sleep(30)' >> $powerbuttonscript
