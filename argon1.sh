@@ -42,8 +42,8 @@ removescript=/usr/bin/argonone-uninstall
 
 daemonfanservice=/lib/systemd/system/$daemonname.service
 
-sudo raspi-config nonint do_i2c 0
-sudo raspi-config nonint do_serial 0	
+#sudo raspi-config nonint do_i2c 0
+#sudo raspi-config nonint do_serial 0	
 	
 if [ ! -f $daemonconfigfile ]; then
 	# Generate config file for fan speed
