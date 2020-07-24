@@ -18,7 +18,7 @@ argon_check_pkg() {
     fi
 }
 
-pkglist=(raspi-gpio python-rpi.gpio python3-rpi.gpio python-smbus python3-smbus i2c-tools)
+pkglist=(python3-rpi.gpio python3-smbus i2c-tools)
 for curpkg in ${pkglist[@]}; do
 	sudo apt-get install -y $curpkg
 	RESULT=$(argon_check_pkg "$curpkg")
@@ -77,7 +77,7 @@ fi
 # Generate script that runs every shutdown event
 argon_create_file $shutdownscript
 
-echo "#!/usr/bin/python" >> $shutdownscript
+echo "#!/usr/bin/python3" >> $shutdownscript
 echo 'import sys' >> $shutdownscript
 echo 'import smbus' >> $shutdownscript
 echo 'import RPi.GPIO as GPIO' >> $shutdownscript
@@ -100,7 +100,7 @@ sudo chmod 755 $shutdownscript
 
 argon_create_file $powerbuttonscript
 
-echo "#!/usr/bin/python" >> $powerbuttonscript
+echo "#!/usr/bin/python3" >> $powerbuttonscript
 echo 'import smbus' >> $powerbuttonscript
 echo 'import RPi.GPIO as GPIO' >> $powerbuttonscript
 echo 'import os' >> $powerbuttonscript
