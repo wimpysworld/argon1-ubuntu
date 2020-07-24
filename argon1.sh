@@ -40,7 +40,7 @@ done
 daemonname="argononed"
 powerbuttonscript="/usr/bin/${daemonname}.py"
 shutdownscript="/lib/systemd/system-shutdown/${daemonname}-poweroff.py"
-daemonconfigfile="/etc/${daemonnam}.conf"
+daemonconfigfile="/etc/${daemonname}.conf"
 configscript="/usr/bin/argonone-config"
 removescript="/usr/bin/argonone-uninstall"
 daemonfanservice="/lib/systemd/system/${daemonname}.service"
@@ -48,33 +48,33 @@ daemonfanservice="/lib/systemd/system/${daemonname}.service"
 #sudo raspi-config nonint do_i2c 0
 #sudo raspi-config nonint do_serial 0
 
-if [ ! -f $daemonconfigfile ]; then
+if [ ! -f "${daemonconfigfile}" ]; then
     # Generate config file for fan speed
-    sudo touch $daemonconfigfile
-    sudo chmod 666 $daemonconfigfile
-    echo '#' >> $daemonconfigfile
-    echo '# Argon One Fan Configuration' >> $daemonconfigfile
-    echo '#' >> $daemonconfigfile
-    echo '# List below the temperature (Celsius) and fan speed (in percent) pairs' >> $daemonconfigfile
-    echo '# Use the following form:' >> $daemonconfigfile
-    echo '# min.temperature=speed' >> $daemonconfigfile
-    echo '#' >> $daemonconfigfile
-    echo '# Example:' >> $daemonconfigfile
-    echo '# 55=10' >> $daemonconfigfile
-    echo '# 60=55' >> $daemonconfigfile
-    echo '# 65=100' >> $daemonconfigfile
-    echo '#' >> $daemonconfigfile
-    echo '# Above example sets the fan speed to' >> $daemonconfigfile
-    echo '#' >> $daemonconfigfile
-    echo '# NOTE: Lines begining with # are ignored' >> $daemonconfigfile
-    echo '#' >> $daemonconfigfile
-    echo '# Type the following at the command line for changes to take effect:' >> $daemonconfigfile
-    echo '# sudo systemctl restart '$daemonname'.service' >> $daemonconfigfile
-    echo '#' >> $daemonconfigfile
-    echo '# Start below:' >> $daemonconfigfile
-    echo '55=10' >> $daemonconfigfile
-    echo '60=55' >> $daemonconfigfile
-    echo '65=100' >> $daemonconfigfile
+    cat <<'EOM' > "${daemonconfigfile}"
+#
+# Argon One Fan Configuration
+#
+# List below the temperature (Celsius) and fan speed (in percent) pairs
+# Use the following form:
+# min.temperature=speed
+#
+# Defaults; 10% fan speed when >= 55C, 55% fan speed when >= 60C, 100% fan speed when >= 65C
+# 55=10
+# 60=55
+# 65=100
+#
+# Always on example, fan will always run at 100%
+# 1=100
+#
+# Type the following at the command line for changes to take effect:
+# sudo systemctl restart argononed.service
+#
+# Start below:
+55=10
+60=55
+65=100
+EOM
+    chmod 644 "${daemonconfigfile}"
 fi
 
 # Generate script that runs every shutdown event
