@@ -38,13 +38,12 @@ for curpkg in ${pkglist[@]}; do
 done
 
 daemonname="argononed"
-powerbuttonscript=/usr/bin/$daemonname.py
-shutdownscript="/lib/systemd/system-shutdown/"$daemonname"-poweroff.py"
-daemonconfigfile=/etc/$daemonname.conf
-configscript=/usr/bin/argonone-config
-removescript=/usr/bin/argonone-uninstall
-
-daemonfanservice=/lib/systemd/system/$daemonname.service
+powerbuttonscript="/usr/bin/${daemonname}.py"
+shutdownscript="/lib/systemd/system-shutdown/${daemonname}-poweroff.py"
+daemonconfigfile="/etc/${daemonnam}.conf"
+configscript="/usr/bin/argonone-config"
+removescript="/usr/bin/argonone-uninstall"
+daemonfanservice="/lib/systemd/system/${daemonname}.service"
 
 #sudo raspi-config nonint do_i2c 0
 #sudo raspi-config nonint do_serial 0
