@@ -220,24 +220,6 @@ WantedBy=multi-user.target
 EOM
 chmod 644 "${daemonfanservice}"
 
-argon_create_file $daemonfanservice
-
-# Fan Daemon
-echo "[Unit]" >> $daemonfanservice
-echo "Description=Argon One Fan and Button Service" >> $daemonfanservice
-echo "After=multi-user.target" >> $daemonfanservice
-echo '[Service]' >> $daemonfanservice
-echo 'Type=simple' >> $daemonfanservice
-echo "Restart=always" >> $daemonfanservice
-echo "RemainAfterExit=true" >> $daemonfanservice
-echo "ExecStart=/usr/bin/python3 $powerbuttonscript" >> $daemonfanservice
-echo '[Install]' >> $daemonfanservice
-echo "WantedBy=multi-user.target" >> $daemonfanservice
-
-sudo chmod 644 $daemonfanservice
-
-argon_create_file $removescript
-
 # Uninstall Script
 echo '#!/bin/bash' >> $removescript
 echo 'echo "-------------------------"' >> $removescript
