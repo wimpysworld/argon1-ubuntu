@@ -78,26 +78,25 @@ EOM
 fi
 
 # Generate script that runs every shutdown event
-argon_create_file $shutdownscript
-
-echo "#!/usr/bin/python3" >> $shutdownscript
-echo 'import sys' >> $shutdownscript
-echo 'import smbus' >> $shutdownscript
-echo 'import RPi.GPIO as GPIO' >> $shutdownscript
-echo 'rev = GPIO.RPI_REVISION' >> $shutdownscript
-echo 'if rev == 2 or rev == 3:' >> $shutdownscript
-echo '	bus = smbus.SMBus(1)' >> $shutdownscript
-echo 'else:' >> $shutdownscript
-echo '	bus = smbus.SMBus(0)' >> $shutdownscript
-
-echo 'if len(sys.argv)>1:' >> $shutdownscript
-echo "	bus.write_byte(0x1a,0)"  >> $shutdownscript
-echo '	if sys.argv[1] == "poweroff" or sys.argv[1] == "halt":'  >> $shutdownscript
-echo "		try:"  >> $shutdownscript
-echo "			bus.write_byte(0x1a,0xFF)"  >> $shutdownscript
-echo "		except:"  >> $shutdownscript
-echo "			rev=0"  >> $shutdownscript
-sudo chmod 755 $shutdownscript
+cat <<'EOM' > "${shutdownscript}"
+#!/usr/bin/python3
+import sys
+import smbus
+import RPi.GPIO as GPIO
+rev = GPIO.RPI_REVISION
+if rev == 2 or rev == 3:
+    bus = smbus.SMBus(1)
+else:
+    bus = smbus.SMBus(0)
+if len(sys.argv)>1:
+    bus.write_byte(0x1a,0)
+    if sys.argv[1] == "poweroff" or sys.argv[1] == "halt":
+        try:
+            bus.write_byte(0x1a,0xFF)
+        except:
+            rev=0
+EOM
+chmod 755 "${shutdownscript}"
 
 # Generate script to monitor shutdown button
 
