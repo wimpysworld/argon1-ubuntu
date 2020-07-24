@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# Check if the user running the script is root
+if [ "$(id -u)" -ne 0 ]; then
+  echo "[!] ERROR: You need to be root."
+  exit 1
+fi
+
 argon_create_file() {
     if [ -f $1 ]; then
         sudo rm $1
