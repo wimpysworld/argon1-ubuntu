@@ -99,115 +99,126 @@ EOM
 chmod 755 "${shutdownscript}"
 
 # Generate script to monitor shutdown button
+cat <<'EOM' > "${powerbuttonscript}"
+#!/usr/bin/python3
+import smbus
+import RPi.GPIO as GPIO
+import os
+import time
+from threading import Thread
+rev = GPIO.RPI_REVISION
+if rev == 2 or rev == 3:
+    bus = smbus.SMBus(1)
+else:
+    bus = smbus.SMBus(0)
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+shutdown_pin=4
+GPIO.setup(shutdown_pin, GPIO.IN,  pull_up_down=GPIO.PUD_DOWN)
 
-argon_create_file $powerbuttonscript
+def shutdown_check():
+    while True:
+        pulsetime = 1
+        GPIO.wait_for_edge(shutdown_pin, GPIO.RISING)
+        time.sleep(0.01)
+        while GPIO.input(shutdown_pin) == GPIO.HIGH:
+            time.sleep(0.01)
+            pulsetime += 1
+        if pulsetime >=2 and pulsetime <=3:
+            os.system("reboot")
+        elif pulsetime >=4 and pulsetime <=5:
+            os.system("shutdown now -h")
 
-echo "#!/usr/bin/python3" >> $powerbuttonscript
-echo 'import smbus' >> $powerbuttonscript
-echo 'import RPi.GPIO as GPIO' >> $powerbuttonscript
-echo 'import os' >> $powerbuttonscript
-echo 'import time' >> $powerbuttonscript
-echo 'from threading import Thread' >> $powerbuttonscript
-echo 'rev = GPIO.RPI_REVISION' >> $powerbuttonscript
-echo 'if rev == 2 or rev == 3:' >> $powerbuttonscript
-echo '	bus = smbus.SMBus(1)' >> $powerbuttonscript
-echo 'else:' >> $powerbuttonscript
-echo '	bus = smbus.SMBus(0)' >> $powerbuttonscript
+def get_fanspeed(tempval, configlist):
+    for curconfig in configlist:
+        curpair = curconfig.split("=")
+        tempcfg = float(curpair[0])
+        fancfg = int(float(curpair[1]))
+        if tempval >= tempcfg:
+            return fancfg
+    return 0
 
-echo 'GPIO.setwarnings(False)' >> $powerbuttonscript
-echo 'GPIO.setmode(GPIO.BCM)' >> $powerbuttonscript
-echo 'shutdown_pin=4' >> $powerbuttonscript
-echo 'GPIO.setup(shutdown_pin, GPIO.IN,  pull_up_down=GPIO.PUD_DOWN)' >> $powerbuttonscript
+def load_config(fname):
+    newconfig = []
+    try:
+        with open(fname, "r") as fp:
+            for curline in fp:
+                if not curline:
+                    continue
+                tmpline = curline.strip()
+                if not tmpline:
+                    continue
+                if tmpline[0] == "#":
+                    continue
+                tmppair = tmpline.split("=")
+                if len(tmppair) != 2:
+                    continue
+                tempval = 0
+                fanval = 0
+                try:
+                    tempval = float(tmppair[0])
+                    if tempval < 0 or tempval > 100:
+                        continue
+                except:
+                    continue
+                try:
+                    fanval = int(float(tmppair[1]))
+                    if fanval < 0 or fanval > 100:
+                        continue
+                except:
+                    continue
+                newconfig.append( "{:5.1f}={}".format(tempval,fanval))
+        if len(newconfig) > 0:
+            newconfig.sort(reverse=True)
+    except:
+        return []
+    return newconfig
 
-echo 'def shutdown_check():' >> $powerbuttonscript
-echo '	while True:' >> $powerbuttonscript
-echo '		pulsetime = 1' >> $powerbuttonscript
-echo '		GPIO.wait_for_edge(shutdown_pin, GPIO.RISING)' >> $powerbuttonscript
-echo '		time.sleep(0.01)' >> $powerbuttonscript
-echo '		while GPIO.input(shutdown_pin) == GPIO.HIGH:' >> $powerbuttonscript
-echo '			time.sleep(0.01)' >> $powerbuttonscript
-echo '			pulsetime += 1' >> $powerbuttonscript
-echo '		if pulsetime >=2 and pulsetime <=3:' >> $powerbuttonscript
-echo '			os.system("reboot")' >> $powerbuttonscript
-echo '		elif pulsetime >=4 and pulsetime <=5:' >> $powerbuttonscript
-echo '			os.system("shutdown now -h")' >> $powerbuttonscript
+def temp_check():
+    fanconfig = ["65=100", "60=55", "55=10"]
+    tmpconfig = load_config("'$daemonconfigfile'")
+    if len(tmpconfig) > 0:
+        fanconfig = tmpconfig
+    address=0x1a
+    prevblock=0
+    while True:
+        temp = os.popen("cat /sys/class/thermal/thermal_zone0/temp").readline()
+        val = float(int(temp)/1000)
+        block = get_fanspeed(val, fanconfig)
+        if block < prevblock:
+            time.sleep(30)
+        prevblock = block
+        try:
+            bus.write_byte(address,block)
+        except IOError:
+            temp=""
+        time.sleep(30)
 
-echo 'def get_fanspeed(tempval, configlist):' >> $powerbuttonscript
-echo '	for curconfig in configlist:' >> $powerbuttonscript
-echo '		curpair = curconfig.split("=")' >> $powerbuttonscript
-echo '		tempcfg = float(curpair[0])' >> $powerbuttonscript
-echo '		fancfg = int(float(curpair[1]))' >> $powerbuttonscript
-echo '		if tempval >= tempcfg:' >> $powerbuttonscript
-echo '			return fancfg' >> $powerbuttonscript
-echo '	return 0' >> $powerbuttonscript
+try:
+    t1 = Thread(target = shutdown_check)
+    t2 = Thread(target = temp_check)
+    t1.start()
+    t2.start()
+except:
+    t1.stop()
+    t2.stop()
+    GPIO.cleanup()
+EOM
+chmod 755 "${powerbuttonscript}"
 
-echo 'def load_config(fname):' >> $powerbuttonscript
-echo '	newconfig = []' >> $powerbuttonscript
-echo '	try:' >> $powerbuttonscript
-echo '		with open(fname, "r") as fp:' >> $powerbuttonscript
-echo '			for curline in fp:' >> $powerbuttonscript
-echo '				if not curline:' >> $powerbuttonscript
-echo '					continue' >> $powerbuttonscript
-echo '				tmpline = curline.strip()' >> $powerbuttonscript
-echo '				if not tmpline:' >> $powerbuttonscript
-echo '					continue' >> $powerbuttonscript
-echo '				if tmpline[0] == "#":' >> $powerbuttonscript
-echo '					continue' >> $powerbuttonscript
-echo '				tmppair = tmpline.split("=")' >> $powerbuttonscript
-echo '				if len(tmppair) != 2:' >> $powerbuttonscript
-echo '					continue' >> $powerbuttonscript
-echo '				tempval = 0' >> $powerbuttonscript
-echo '				fanval = 0' >> $powerbuttonscript
-echo '				try:' >> $powerbuttonscript
-echo '					tempval = float(tmppair[0])' >> $powerbuttonscript
-echo '					if tempval < 0 or tempval > 100:' >> $powerbuttonscript
-echo '						continue' >> $powerbuttonscript
-echo '				except:' >> $powerbuttonscript
-echo '					continue' >> $powerbuttonscript
-echo '				try:' >> $powerbuttonscript
-echo '					fanval = int(float(tmppair[1]))' >> $powerbuttonscript
-echo '					if fanval < 0 or fanval > 100:' >> $powerbuttonscript
-echo '						continue' >> $powerbuttonscript
-echo '				except:' >> $powerbuttonscript
-echo '					continue' >> $powerbuttonscript
-echo '				newconfig.append( "{:5.1f}={}".format(tempval,fanval))' >> $powerbuttonscript
-echo '		if len(newconfig) > 0:' >> $powerbuttonscript
-echo '			newconfig.sort(reverse=True)' >> $powerbuttonscript
-echo '	except:' >> $powerbuttonscript
-echo '		return []' >> $powerbuttonscript
-echo '	return newconfig' >> $powerbuttonscript
-
-echo 'def temp_check():' >> $powerbuttonscript
-echo '	fanconfig = ["65=100", "60=55", "55=10"]' >> $powerbuttonscript
-echo '	tmpconfig = load_config("'$daemonconfigfile'")' >> $powerbuttonscript
-echo '	if len(tmpconfig) > 0:' >> $powerbuttonscript
-echo '		fanconfig = tmpconfig' >> $powerbuttonscript
-echo '	address=0x1a' >> $powerbuttonscript
-echo '	prevblock=0' >> $powerbuttonscript
-echo '	while True:' >> $powerbuttonscript
-echo '		temp = os.popen("cat /sys/class/thermal/thermal_zone0/temp").readline()' >> $powerbuttonscript
-echo '		val = float(int(temp)/1000)' >> $powerbuttonscript
-echo '		block = get_fanspeed(val, fanconfig)' >> $powerbuttonscript
-echo '		if block < prevblock:' >> $powerbuttonscript
-echo '			time.sleep(30)' >> $powerbuttonscript
-echo '		prevblock = block' >> $powerbuttonscript
-echo '		try:' >> $powerbuttonscript
-echo '			bus.write_byte(address,block)' >> $powerbuttonscript
-echo '		except IOError:' >> $powerbuttonscript
-echo '			temp=""' >> $powerbuttonscript
-echo '		time.sleep(30)' >> $powerbuttonscript
-
-echo 'try:' >> $powerbuttonscript
-echo '	t1 = Thread(target = shutdown_check)' >> $powerbuttonscript
-echo '	t2 = Thread(target = temp_check)' >> $powerbuttonscript
-echo '	t1.start()' >> $powerbuttonscript
-echo '	t2.start()' >> $powerbuttonscript
-echo 'except:' >> $powerbuttonscript
-echo '	t1.stop()' >> $powerbuttonscript
-echo '	t2.stop()' >> $powerbuttonscript
-echo '	GPIO.cleanup()' >> $powerbuttonscript
-
-sudo chmod 755 $powerbuttonscript
+cat <<"EOM" > "${daemonfanservice}"
+[Unit]
+Description=Argon One Fan and Button Service
+After=multi-user.target
+[Service]
+Type=simple
+Restart=always
+RemainAfterExit=true
+ExecStart=${powerbuttonscript}
+[Install]
+WantedBy=multi-user.target
+EOM
+chmod 644 "${daemonfanservice}"
 
 argon_create_file $daemonfanservice
 
