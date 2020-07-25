@@ -6,7 +6,7 @@
 
 <p align="center"><b>Argon Fan HAT / Argon ONE Case Fan Controller for Ubuntu</b></p>
 <div align="center"><img src=".github/argononefanhat.jpg" alt="Argon Fan HAT" /></div>
-<p align="center">Made with 💝 for <img src=".github/ubuntu.png" align="top" width="16" /></p>
+<p align="center">Made with 💝 for <img src=".github/ubuntu.png" align="top" width="18" /></p>
 
 ## Introduction
 
