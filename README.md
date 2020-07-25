@@ -70,7 +70,7 @@ Available options are
 
 ## Credits
 
-  * Thanks to [kounch](https://github.com/kounch/) for their [https://github.com/kounch/argonone](Arch Linux PKGBUILD for Argon One).
+  * Thanks to [kounch](https://github.com/kounch/) for their [Arch Linux PKGBUILD for Argon One](https://github.com/kounch/argonone).
   * Thanks to [Cédric Meuter](https://github.com/meuter) for their [argon1.sh adapted for Ubuntu 20.04](https://github.com/meuter/argon-one-case-ubuntu-20.04).
 
 ## TODO
