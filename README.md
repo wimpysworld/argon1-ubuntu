@@ -34,7 +34,7 @@ This script will only work on [Ubuntu running on a Raspberry Pi](https://ubuntu.
     * `git clone https://github.com/wimpysworld/argon1-ubuntu.git`
   * Install the fan controller
     * `cd argon1-ubuntu`
-    * `sudo ./argon1.sh --install`
+    * `sudo ./argon1-ubuntu --install`
 
 ### Usage
 
@@ -47,6 +47,9 @@ Available options are
   --install     Install the Argon ONE Case Fan / Argon FanHAT driver
   --uninstall   Uninstall the Argon ONE Case Fan / Argon FanHAT driver
 ```
+
+To modify you fan curve edit `/etc/argononed.conf` and then execute
+`sudo systemctl restart argononed.service` to made the changes active.
 
 ### Argon ONE Pi 4 Power Button Functions
 
