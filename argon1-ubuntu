@@ -57,10 +57,6 @@ function config_argonone() {
 }
 
 function install_argonone() {
-    # TODO: Is this required on Ubuntu? If so, migrate to pibootctl when that is available.
-    #sudo raspi-config nonint do_i2c 0
-    #sudo raspi-config nonint do_serial 0
-
     apt install -y python3-rpi.gpio python3-smbus i2c-tools
 
     if [ ! -f "${daemonconfigfile}" ]; then
