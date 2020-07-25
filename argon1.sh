@@ -259,7 +259,6 @@ EOM
     systemctl daemon-reload
     systemctl enable ${daemonname}.service
     systemctl start ${daemonname}.service
-    exit
 }
 
 function uninstall_argonone() {
@@ -271,7 +270,6 @@ function uninstall_argonone() {
     systemctl daemon-reload
     echo "Removed Argon One Services."
     echo "Cleanup will complete after restarting the device."
-    exit
 }
 
 # Take command line arguments
@@ -279,13 +277,16 @@ while [ $# -gt 0 ]; do
   case "${1}" in
     -config|--config)
       shift
-      config_argonone;;
+      config_argonone
+      exit 0;;
     -install|--install)
       shift
-      install_argonone;;
+      install_argonone
+      exit 0;;
     -uninstall|--uninstall)
       shift
-      uninstall_argonone;;
+      uninstall_argonone
+      exit 0;;
     -h|--h|-help|--help)
       usage
       exit 0;;
