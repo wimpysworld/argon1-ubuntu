@@ -257,7 +257,7 @@ After=multi-user.target
 Type=simple
 Restart=always
 RemainAfterExit=true
-ExecStart=${powerbuttonscript}
+ExecStart=/usr/bin/argononed.py
 [Install]
 WantedBy=multi-user.target
 EOM
