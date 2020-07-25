@@ -6,6 +6,28 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+HOST_ARCH=$(uname -m)
+if [ "${HOST_ARCH}" != "armv7l" ] && [ "${HOST_ARCH}" != "aarch64" ]; then
+  echo "[!] This script is only intended to run on ARM devices."
+  exit 1
+fi
+
+# Check if we're running on a Raspberry Pi
+PI_MODEL=$(grep ^Model /proc/cpuinfo  | cut -d':' -f2- | sed 's/ R/R/')
+if [[ "${PI_MODEL}" == *"Raspberry Pi"* ]]; then
+  echo "[+] Configuring your ${PI_MODEL}"
+else
+  echo "[!] This is not a Raspberry Pi. Quitting!"
+  exit 1
+fi
+
+# Check if we're running Ubuntu
+IS_UBUNTU=$(lsb_release -is)
+if [ "${IS_UBUNTU}" != "Ubuntu" ]; then
+  echo "[!] This script is only intended to run on Ubuntu."
+  exit 1
+fi
+
 daemonname="argononed"
 powerbuttonscript="/usr/bin/${daemonname}.py"
 shutdownscript="/lib/systemd/system-shutdown/${daemonname}-poweroff.py"
