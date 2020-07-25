@@ -50,7 +50,7 @@ function usage () {
 function config_argonone() {
     echo "Here is to current Argon fan configuration:"
     echo
-    cat ${daemonconfigfile}
+    cat "${daemonconfigfile}"
     echo
     echo "Edit ${daemonconfigfile} to change your fan curve and then run"
     echo "sudo 'systemctl restart argononed.service' to activate the changes."
