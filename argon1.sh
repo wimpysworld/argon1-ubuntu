@@ -12,6 +12,19 @@ shutdownscript="/lib/systemd/system-shutdown/${daemonname}-poweroff.py"
 daemonconfigfile="/etc/${daemonname}.conf"
 daemonfanservice="/lib/systemd/system/${daemonname}.service"
 
+# Display help usage
+function usage () {
+  echo
+  echo "Usage"
+  echo "  $0 [options]"
+  echo
+  echo "Available options are"
+  echo "  --config      Get help about how to configure the fan"
+  echo "  --install     Install the Argon ONE Case Fan / Argon FanHAT driver"
+  echo "  --uninstall   Uninstall the Argon ONE Case Fan / Argon FanHAT driver"
+  echo
+}
+
 function config_argonone() {
     echo "Here is to current Argon fan configuration:"
     echo
