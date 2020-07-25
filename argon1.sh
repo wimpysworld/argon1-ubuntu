@@ -160,10 +160,10 @@ def shutdown_check():
             time.sleep(0.01)
             pulsetime += 1
         if pulsetime >= 2 and pulsetime <= 3:
-            TODO: Use subprocess instead of os.system
+            # TODO: Use subprocess instead of os.system
             os.system("reboot")
         elif pulsetime >= 4 and pulsetime <= 5:
-            TODO: Use subprocess instead of os.system
+            # TODO: Use subprocess instead of os.system
             os.system("shutdown now -h")
 
 
