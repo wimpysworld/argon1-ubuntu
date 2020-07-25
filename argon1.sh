@@ -6,37 +6,6 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-argon_create_file() {
-    if [ -f $1 ]; then
-        sudo rm $1
-    fi
-    sudo touch $1
-    sudo chmod 666 $1
-}
-
-argon_check_pkg() {
-    RESULT=$(dpkg-query -W -f='${Status}\n' "$1" 2> /dev/null | grep "installed")
-
-    if [ "" == "$RESULT" ]; then
-        echo "NG"
-    else
-        echo "OK"
-    fi
-}
-
-pkglist=(python3-rpi.gpio python3-smbus i2c-tools)
-for curpkg in ${pkglist[@]}; do
-    sudo apt-get install -y $curpkg
-    RESULT=$(argon_check_pkg "$curpkg")
-    if [ "NG" == "$RESULT" ]
-    then
-        echo "********************************************************************"
-        echo "Please also connect device to the internet and restart installation."
-        echo "********************************************************************"
-        exit
-    fi
-done
-
 daemonname="argononed"
 powerbuttonscript="/usr/bin/${daemonname}.py"
 shutdownscript="/lib/systemd/system-shutdown/${daemonname}-poweroff.py"
@@ -45,12 +14,15 @@ configscript="/usr/bin/argonone-config"
 removescript="/usr/bin/argonone-uninstall"
 daemonfanservice="/lib/systemd/system/${daemonname}.service"
 
-#sudo raspi-config nonint do_i2c 0
-#sudo raspi-config nonint do_serial 0
+function install_argonone() {
+    #sudo raspi-config nonint do_i2c 0
+    #sudo raspi-config nonint do_serial 0
 
-if [ ! -f "${daemonconfigfile}" ]; then
-    # Generate config file for fan speed
-    cat <<'EOM' > "${daemonconfigfile}"
+    apt install -y python3-rpi.gpio python3-smbus i2c-tools
+
+    if [ ! -f "${daemonconfigfile}" ]; then
+        # Generate config file for fan speed
+        cat <<'EOM' > "${daemonconfigfile}"
 #
 # Argon One Fan Configuration
 #
@@ -74,12 +46,12 @@ if [ ! -f "${daemonconfigfile}" ]; then
 60=55
 65=100
 EOM
-    chmod 644 "${daemonconfigfile}"
-fi
+        chmod 644 "${daemonconfigfile}"
+    fi
 
-# Generate script that runs every shutdown event
-cat <<'EOM' > "${shutdownscript}"
-#!/usr/bin/python3
+    # Generate script that runs every shutdown event
+    cat <<'EOM' > "${shutdownscript}"
+#!/usr/bin/env python3
 import sys
 import smbus
 import RPi.GPIO as GPIO
@@ -96,11 +68,11 @@ if len(sys.argv)>1:
         except:
             rev=0
 EOM
-chmod 755 "${shutdownscript}"
+    chmod 755 "${shutdownscript}"
 
 # Generate script to monitor shutdown button
-cat <<'EOM' > "${powerbuttonscript}"
-#!/usr/bin/python3
+    cat <<'EOM' > "${powerbuttonscript}"
+#!/usr/bin/env python3
 import smbus
 import RPi.GPIO as GPIO
 import os
@@ -204,9 +176,9 @@ except:
     t2.stop()
     GPIO.cleanup()
 EOM
-chmod 755 "${powerbuttonscript}"
+    chmod 755 "${powerbuttonscript}"
 
-cat <<"EOM" > "${daemonfanservice}"
+    cat <<"EOM" > "${daemonfanservice}"
 [Unit]
 Description=Argon One Fan and Button Service
 After=multi-user.target
@@ -218,40 +190,25 @@ ExecStart=${powerbuttonscript}
 [Install]
 WantedBy=multi-user.target
 EOM
-chmod 644 "${daemonfanservice}"
+    chmod 644 "${daemonfanservice}"
 
-# Uninstall Script
-cat <<'EOM' > "${removescript}"
-#!/bin/bash
-echo "-------------------------"
-echo "Argon One Uninstall Tool"
-echo "-------------------------"
-echo -n "Press Y to continue:"
-read -n 1 confirm
-echo
-if [ "$confirm" = "y" ]; then
-    confirm="Y"
-fi
-
-if [ "$confirm" != "Y" ]; then
-    echo "Cancelled"
+    systemctl daemon-reload
+    systemctl enable ${daemonname}.service
+    systemctl start ${daemonname}.service
     exit
-fi
+}
 
-if [ -f '$powerbuttonscript' ]; then
-    sudo systemctl stop '$daemonname'.service
-    sudo systemctl disable '$daemonname'.service
-    sudo /usr/bin/python3 '$shutdownscript' uninstall
-    sudo rm '$powerbuttonscript >> $removescript
-    sudo rm '$shutdownscript >> $removescript
-    sudo rm '$removescript >> $removescript
+function uninstall_argonone() {
+    rm ${powerbuttonscript}
+    rm ${shutdownscript}
+    systemctl stop ${daemonname}.service
+    systemctl disable ${daemonname}.service
+    rm ${daemonfanservice}
+    systemctl daemon-reload
     echo "Removed Argon One Services."
     echo "Cleanup will complete after restarting the device."
-fi
-EOM
-chmod 755 "${removescript}"
-
-
+    exit
+}
 
 sudo systemctl daemon-reload
 sudo systemctl enable $daemonname.service
