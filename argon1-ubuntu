@@ -245,6 +245,11 @@ except:
 EOM
     chmod 755 "${powerbuttonscript}"
 
+    # Stop the service if it is already present.
+    if [ -f "${daemonfanservice}" ]; then
+        systemctl stop ${daemonname}.service
+    fi
+
     cat <<"EOM" > "${daemonfanservice}"
 [Unit]
 Description=Argon One Fan and Button Service
