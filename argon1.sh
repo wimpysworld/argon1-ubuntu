@@ -10,7 +10,6 @@ daemonname="argononed"
 powerbuttonscript="/usr/bin/${daemonname}.py"
 shutdownscript="/lib/systemd/system-shutdown/${daemonname}-poweroff.py"
 daemonconfigfile="/etc/${daemonname}.conf"
-removescript="/usr/bin/argonone-uninstall"
 daemonfanservice="/lib/systemd/system/${daemonname}.service"
 
 function config_argonone() {
@@ -218,14 +217,24 @@ function uninstall_argonone() {
     exit
 }
 
-sudo systemctl daemon-reload
-sudo systemctl enable $daemonname.service
-sudo systemctl start $daemonname.service
-
-echo "***************************"
-echo "Argon One Setup Completed."
-echo "***************************"
-echo 
-echo Use 'argonone-config' to configure fan
-echo Use 'argonone-uninstall' to uninstall
-echo
+# Take command line arguments
+while [ $# -gt 0 ]; do
+  case "${1}" in
+    -config|--config)
+      shift
+      config_argonone;;
+    -install|--install)
+      shift
+      install_argonone;;
+    -uninstall|--uninstall)
+      shift
+      uninstall_argonone;;
+    -h|--h|-help|--help)
+      usage
+      exit 0;;
+    *)
+      echo "[!] ERROR: \"${1}\" is not a supported parameter."
+      usage
+      exit 1;;
+  esac
+done
