@@ -29,7 +29,7 @@ if [ "${IS_UBUNTU}" != "Ubuntu" ]; then
 fi
 
 daemonname="argononed"
-powerbuttonscript="/usr/bin/${daemonname}.py"
+powerbuttonscript="/usr/local/bin/${daemonname}"
 shutdownscript="/lib/systemd/system-shutdown/${daemonname}-poweroff.py"
 daemonconfigfile="/etc/${daemonname}.conf"
 daemonfanservice="/lib/systemd/system/${daemonname}.service"
@@ -257,7 +257,7 @@ After=multi-user.target
 Type=simple
 Restart=always
 RemainAfterExit=true
-ExecStart=/usr/bin/argononed.py
+ExecStart=/usr/local/bin/argononed
 [Install]
 WantedBy=multi-user.target
 EOM
