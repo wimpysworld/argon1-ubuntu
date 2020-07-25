@@ -57,6 +57,7 @@ function config_argonone() {
 }
 
 function install_argonone() {
+    # TODO: Is this required on Ubuntu? If so, migrate to pibootctl when that is available.
     #sudo raspi-config nonint do_i2c 0
     #sudo raspi-config nonint do_serial 0
 
@@ -111,7 +112,9 @@ else:
     bus = smbus.SMBus(0)
 
 if len(sys.argv) > 1:
-    bus.write_byte_data(0x1a,0,0)
+    # TODO: Check this commit, is it required? Perhaps context invocation based on Pi model?
+    # https://github.com/kounch/argonone/commit/973634f5b3795148b03ede2aeaae38b02c05c070
+    bus.write_byte(0x1a,0)
     if sys.argv[1] == "poweroff" or sys.argv[1] == "halt":
         try:
             bus.write_byte_data(0x1a,0,0xFF)
@@ -157,8 +160,10 @@ def shutdown_check():
             time.sleep(0.01)
             pulsetime += 1
         if pulsetime >= 2 and pulsetime <= 3:
+            TODO: Use subprocess instead of os.system
             os.system("reboot")
         elif pulsetime >= 4 and pulsetime <= 5:
+            TODO: Use subprocess instead of os.system
             os.system("shutdown now -h")
 
 
@@ -182,6 +187,7 @@ def load_config(fname):
                 tmpline = curline.strip()
                 if not tmpline:
                     continue
+                # FIXME: Use startswith here
                 if tmpline[0] == "#":
                     continue
                 tmppair = tmpline.split("=")
@@ -217,6 +223,7 @@ def temp_check():
     address = 0x1a
     prevblock = 0
     while True:
+        # FIXME: Don't shell out to `cat` here, read the temp file directly
         temp = os.popen("cat /sys/class/thermal/thermal_zone0/temp").readline()
         val = float(int(temp)/1000)
         block = get_fanspeed(val, fanconfig)
