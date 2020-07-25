@@ -10,9 +10,17 @@ daemonname="argononed"
 powerbuttonscript="/usr/bin/${daemonname}.py"
 shutdownscript="/lib/systemd/system-shutdown/${daemonname}-poweroff.py"
 daemonconfigfile="/etc/${daemonname}.conf"
-configscript="/usr/bin/argonone-config"
 removescript="/usr/bin/argonone-uninstall"
 daemonfanservice="/lib/systemd/system/${daemonname}.service"
+
+function config_argonone() {
+    echo "Here is to current Argon fan configuration:"
+    echo
+    cat ${daemonconfigfile}
+    echo
+    echo "Edit ${daemonconfigfile} to change your fan curve and then run"
+    echo "sudo 'systemctl restart argononed.service' to activate the changes."
+}
 
 function install_argonone() {
     #sudo raspi-config nonint do_i2c 0
