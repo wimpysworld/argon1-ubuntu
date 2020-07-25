@@ -30,7 +30,7 @@ fi
 
 daemonname="argononed"
 powerbuttonscript="/usr/local/bin/${daemonname}"
-shutdownscript="/lib/systemd/system-shutdown/${daemonname}-poweroff.py"
+shutdownscript="/lib/systemd/system-shutdown/${daemonname}-poweroff"
 daemonconfigfile="/etc/${daemonname}.conf"
 daemonfanservice="/lib/systemd/system/${daemonname}.service"
 
