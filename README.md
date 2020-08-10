@@ -24,7 +24,11 @@ The refactor consisted of:
   * Simplifies install/uninstall via an option parser.
   * Removes the config script and desktop icons.
 
-<!-- [![Replace VirtualBox with Bash & QEMU](https://img.youtube.com/vi/AOTYWEgw0hI/0.jpg)](https://www.youtube.com/watch?v=AOTYWEgw0hI) -->
+We have a Discord for this project:
+
+  * <https://discord.gg/wG8bAra>
+
+[![Raspberry Pi Argon Fan HAT & Argon ONE Case Fan controller for Ubuntu](https://img.youtube.com/vi/b1kG7XUvw5E/0.jpg)](https://www.youtube.com/watch?v=b1kG7XUvw5E)
 
 ## Installation
 
