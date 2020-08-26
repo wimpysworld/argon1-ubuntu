@@ -101,7 +101,7 @@ import sys
 import smbus
 import RPi.GPIO as GPIO
 
-rev = GPIO.RPI_REVISION
+rev = GPIO.RPI_INFO['P1_REVISION']
 if rev == 2 or rev == 3:
     bus = smbus.SMBus(1)
 else:
@@ -135,7 +135,7 @@ import os
 import time
 from threading import Thread
 
-rev = GPIO.RPI_REVISION
+rev = GPIO.RPI_INFO['P1_REVISION']
 if rev == 2 or rev == 3:
     bus = smbus.SMBus(1)
 else:
