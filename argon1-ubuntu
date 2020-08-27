@@ -102,6 +102,11 @@ import smbus
 import RPi.GPIO as GPIO
 
 rev = GPIO.RPI_INFO['P1_REVISION']
+# RPi.GPIO versions prior to 0.7.0 can't identify the RPi 4.
+# The RPi4 is reported as revision 2 so we check the REVISION string
+# to see if it is actually a RPi4.
+if GPIO.VERSION < "0.7.0" and rev == 2 and (GPIO.RPI_INFO['REVISION'][3:5]) == "11":
+    rev = 4
 if rev == 2 or rev == 3:
     bus = smbus.SMBus(1)
 else:
@@ -136,6 +141,11 @@ import time
 from threading import Thread
 
 rev = GPIO.RPI_INFO['P1_REVISION']
+# RPi.GPIO versions prior to 0.7.0 can't identify the RPi 4.
+# The RPi4 is reported as revision 2 so we check the REVISION string
+# to see if it is actually a RPi4.
+if GPIO.VERSION < "0.7.0" and rev == 2 and (GPIO.RPI_INFO['REVISION'][3:5]) == "11":
+    rev = 4
 if rev == 2 or rev == 3:
     bus = smbus.SMBus(1)
 else:
