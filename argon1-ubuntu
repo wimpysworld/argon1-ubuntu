@@ -107,7 +107,7 @@ rev = GPIO.RPI_INFO['P1_REVISION']
 # to see if it is actually a RPi4.
 if GPIO.VERSION < "0.7.0" and rev == 2 and (GPIO.RPI_INFO['REVISION'][3:5]) == "11":
     rev = 4
-if rev == 2 or rev == 3:
+if rev == 2 or rev == 3 or rev == 4:
     bus = smbus.SMBus(1)
 else:
     bus = smbus.SMBus(0)
@@ -146,7 +146,7 @@ rev = GPIO.RPI_INFO['P1_REVISION']
 # to see if it is actually a RPi4.
 if GPIO.VERSION < "0.7.0" and rev == 2 and (GPIO.RPI_INFO['REVISION'][3:5]) == "11":
     rev = 4
-if rev == 2 or rev == 3:
+if rev == 2 or rev == 3 or rev == 4:
     bus = smbus.SMBus(1)
 else:
     bus = smbus.SMBus(0)
