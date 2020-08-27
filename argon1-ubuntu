@@ -113,9 +113,10 @@ else:
     bus = smbus.SMBus(0)
 
 if len(sys.argv) > 1:
-    # TODO: Check this commit, is it required? Perhaps context invocation based on Pi model?
-    # https://github.com/kounch/argonone/commit/973634f5b3795148b03ede2aeaae38b02c05c070
-    bus.write_byte(0x1a,0)
+    if rev == 4:
+        bus.write_byte_data(0x1a,0,0)
+    else:
+        bus.write_byte(0x1a,0)
     if sys.argv[1] == "poweroff" or sys.argv[1] == "halt":
         try:
             bus.write_byte_data(0x1a,0,0xFF)
