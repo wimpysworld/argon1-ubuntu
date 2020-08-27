@@ -84,5 +84,8 @@ To modify you fan curve edit `/etc/argononed.conf` and then execute
 
 - [ ] Confirm Argon Fan HAT works on Pi 2, 3 and 4.
 - [ ] Replace use of `os.system()`.
-- [ ] Read `/sys/class/thermal/thermal_zone0/temp` in a Pythonic way.
 - [ ] Clean up parsing of the config file.
+
+## DONE
+
+- [x] Read `/sys/class/thermal/thermal_zone0/temp` in a Pythonic way.
