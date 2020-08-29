@@ -90,6 +90,7 @@ EOM
 
     # Generate script that runs every shutdown event
     cat <<'EOM' > "${shutdownscript}"
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -*- mode: Python; tab-width: 4; indent-tabs-mode: nil; -*-
 # PEP 8, PEP 263.
