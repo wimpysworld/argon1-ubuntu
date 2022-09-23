@@ -16,7 +16,7 @@ controller for Ubuntu and is derived from the origin script published by
 
   * <https://download.argon40.com/argon1.sh>
 
-The refactor consisted of: 
+The refactor consisted of:
 
   * Adds support for Ubuntu by reading temps from sysfs.
   * Adds support for Ubuntu 20.04 by only using Python 3.
@@ -24,9 +24,7 @@ The refactor consisted of:
   * Simplifies install/uninstall via an option parser.
   * Removes the config script and desktop icons.
 
-We have a Discord for this project:
-
-  * <https://discord.gg/wG8bAra>
+We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/wG8bAra)
 
 [![Raspberry Pi Argon Fan HAT & Argon ONE Case Fan controller for Ubuntu](https://img.youtube.com/vi/b1kG7XUvw5E/0.jpg)](https://www.youtube.com/watch?v=b1kG7XUvw5E)
 
